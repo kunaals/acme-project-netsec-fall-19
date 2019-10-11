@@ -32,6 +32,12 @@ variables:
 
   image: northaeth/studentdocker:latest
 
+  interruptible: true
+
+  only:
+    refs:
+      - master
+
 
 http-single-domain:
   <<: *test_definition
@@ -91,3 +97,7 @@ give-score:
   artifacts:
     paths:
       - "test-results"
+  interruptible: true
+  only:
+    refs:
+      - master
