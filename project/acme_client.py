@@ -5,10 +5,16 @@ from pprint import pprint
 import sys, requests, copy, json, base64, binascii
 
 ACME_SERVER_URL = "https://localhost:14000/dir"
+pebble_cert = "project/pebble_https_ca.pem"
 directory_headers = {"User-Agent": "myacmeclient"}
+# GET acme server config from /dir
+directory_data = requests.get(
+    url=ACME_SERVER_URL, 
+    headers=directory_headers, 
+    verify=pebble_cert
+).json()
 jws_headers = copy.deepcopy(directory_headers)
 jws_headers["Content-Type"] = "application/jose+json"
-pebble_cert = "project/pebble_https_ca.pem"
 
 # for str in sys.argv:
 #     print(str)
@@ -23,23 +29,61 @@ def _b64_rsa_public_numbers(input):
     num = "0{0}".format(num) if len(num) % 2 else num
     return _b64(binascii.unhexlify(num.encode("utf-8")))
 
+def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None):
+    # Generate protected header
+    protected = {
+        "alg": "RS256",
+        "nonce": nonce,
+        "url": url
+    }
+    if jwk:
+        protected["jwk"] = jwk
+    elif kid:
+        protected["kid"] = kid
+    else:
+        raise Exception('No JWK or kid supplied.')
+    
+    # Convert to URL-safe encoding
+    protected64 = _b64(json.dumps(protected).encode("utf8"))
+
+    # Convert payload to URL-safe encoding
+    payload64 = _b64(json.dumps(payload).encode("utf8"))
+    
+    # If request is POST-as-GET we set payload to be empty string
+    if payload == "":
+        payload64 = ""
+    
+    # Message is protected and payload dumps separated by a '.'
+    message = "{0}.{1}".format(protected64, payload64).encode('utf-8')
+
+    # Create RSA signature
+    sig = rsa_key.sign(
+        message,
+        padding.PKCS1v15(),
+        hashes.SHA256()
+    )
+
+    # Generate JOSE payload for request
+    jose_payload = {
+        "protected": protected64,
+        "payload": payload64,
+        "signature": _b64(sig)
+    }
+
+    r = requests.post(
+        url=url, 
+        json=jose_payload, 
+        headers=jws_headers, 
+        verify=pebble_cert
+    )
+
+    if r.status_code != 200 and r.status_code != 201:
+        raise Exception("Failed request. " + json.dumps(r.json()))
+    
+    return r
+
 def create_account():
-    # GET acme server config from /dir
-    r = requests.get(
-        url=ACME_SERVER_URL, 
-        headers=directory_headers, 
-        verify=pebble_cert
-    )
-    directory_data = r.json()
-
     # Create new account
-    # Retrieve new replay-nonce
-    nonce = requests.head(
-        url = directory_data['newNonce'], 
-        headers=directory_headers, 
-        verify=pebble_cert
-    )
-
     # Generate RSA key
     rsa_key = rsa.generate_private_key(
         public_exponent=65537,
@@ -63,53 +107,71 @@ def create_account():
         ))
 
     # Generate protected header
-    protected = {
-        "alg": "RS256",
-        "jwk": {
-            "kty": "RSA",
-            "n": _b64_rsa_public_numbers(rsa_key.public_key().public_numbers()._n),
-            "e": _b64_rsa_public_numbers(rsa_key.public_key().public_numbers()._e)
-        },
-        "nonce": nonce.headers["Replay-Nonce"],
-        "url": directory_data["newAccount"]
+    jwk = {
+        "kty": "RSA",
+        "n": _b64_rsa_public_numbers(rsa_key.public_key().public_numbers()._n),
+        "e": _b64_rsa_public_numbers(rsa_key.public_key().public_numbers()._e)
     }
-    # Convert to URL-safe encoding
-    protected64 = _b64(json.dumps(protected).encode("utf8"))
 
     # Generate payload for JWS
     payload = {
         "termsOfServiceAgreed": True,
         "contact": ["mailto:admin@lol.ch"]
     }
-    # Conver to URL-safe encoding
-    payload64 = _b64(json.dumps(payload).encode("utf8"))
 
-    # Message is protected and payload dumps separated by a '.'
-    message = "{0}.{1}".format(protected64, payload64).encode('utf-8')
-
-    # Create RSA signature
-    sig = rsa_key.sign(
-        message,
-        padding.PKCS1v15(),
-        hashes.SHA256()
-    )
-
-    # Generate JOSE payload for final request
-    jose_payload = {
-        "protected": protected64,
-        "payload": payload64,
-        "signature": _b64(sig)
-    }
-
-    # pprint("{0}.{1}.{2}".format(jose_payload['protected'], jose_payload['payload'], jose_payload['signature']))
-    # pprint(jws_headers)
-
-    account = requests.post(
-        url=directory_data['newAccount'], 
-        json=jose_payload, 
-        headers=jws_headers, 
+    # Retrieve new replay-nonce
+    nonce = requests.head(
+        url = directory_data['newNonce'], 
+        headers=directory_headers, 
         verify=pebble_cert
     )
-    return account
+    account = _send_signed_request(
+        directory_data['newAccount'], 
+        payload, 
+        nonce=nonce.headers['Replay-Nonce'], 
+        rsa_key=rsa_key, 
+        jwk=jwk
+    )
+    return account, rsa_key
 
-pprint(create_account().headers)
+def submit_order(domains, challenge, nonce, rsa_key, kid):
+    payload = { 'identifiers': [] }
+    for d in domains:
+        payload['identifiers'].append({"type": challenge, "value": d})
+    
+    order = _send_signed_request(
+        directory_data['newOrder'], 
+        payload,
+        nonce=nonce,
+        rsa_key=rsa_key,
+        kid=kid
+    )
+    return order, order.headers['Replay-Nonce']
+
+def authorization_request(authorizations, nonce, rsa_key, kid):
+    challenges = []
+    for a in authorizations:
+        chall = _send_signed_request(
+            a,
+            "",
+            nonce,
+            rsa_key,
+            kid=kid
+        )
+        nonce = chall.headers['Replay-Nonce']
+        challenges.extend(chall.json()["challenges"])
+    return challenges, nonce
+
+# main
+# Create account
+account, rsa_key = create_account()
+kid = account.headers['Location']
+nonce = account.headers['Replay-Nonce']
+
+# Submit order
+order, nonce = submit_order(["example.com"], "dns", nonce, rsa_key, kid)
+authorizations = order.json()["authorizations"] # list of authorizations
+
+# Solicit challenges
+challenges, nonce = authorization_request(authorizations, nonce, rsa_key, kid)
+pprint(challenges)
