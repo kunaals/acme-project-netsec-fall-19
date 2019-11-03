@@ -16,6 +16,12 @@ def _b64(b):
     # encodes string as base64
     return base64.urlsafe_b64encode(b).decode('utf-8').rstrip('=')
 
+def _b64_rsa_public_numbers(input):
+    # encodes an RSA public number into b64 url-safe string
+    num = "{0:x}".format(input)
+    num = "0{0}".format(num) if len(num) % 2 else num
+    return _b64(binascii.unhexlify(num.encode("utf-8")))
+
 directory_headers = {"User-Agent": "myacmeclient"}
 jws_headers = copy.deepcopy(directory_headers)
 jws_headers["Content-Type"] = "application/jose+json"
@@ -39,19 +45,25 @@ rsa_key = rsa.generate_private_key(
 )
 
 # Write our key to disk for safe keeping
-with open("project/rsa_key.pem", "wb") as f:
+with open("project/rsa_private_key.pem", "wb") as f:
     f.write(rsa_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
         encryption_algorithm=serialization.BestAvailableEncryption(b"passphrase"),
     ))
 
+with open("project/rsa_public_key.pem", "wb") as f:
+    f.write(rsa_key.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    ))
+
 protected = {
     "alg": "RS256",
     "jwk": {
         "kty": "RSA",
-        "n": str(rsa_key.public_key().public_numbers()._n),
-        "e": str(rsa_key.public_key().public_numbers()._e)
+        "n": _b64_rsa_public_numbers(rsa_key.public_key().public_numbers()._n),
+        "e": _b64_rsa_public_numbers(rsa_key.public_key().public_numbers()._e)
     },
     "nonce": nonce.headers["Replay-Nonce"],
     "url": directory_data["newAccount"]
@@ -66,17 +78,11 @@ payload64 = _b64(json.dumps(payload).encode("utf8"))
 
 message = "{0}.{1}".format(protected64, payload64).encode('utf-8')
 
-chosen_hash = hashes.SHA256()
-hasher = hashes.Hash(chosen_hash, default_backend())
-hasher.update(protected64.encode('utf-8'))
-hasher.update(('.'+payload64).encode('utf-8'))
-digest = hasher.finalize()
 sig = rsa_key.sign(
-    digest,
+    message,
     padding.PKCS1v15(),
-    utils.Prehashed(chosen_hash)
+    hashes.SHA256()
 )
-# print(_b64(sig))
 
 jose_payload = {
     "protected": protected64,
@@ -84,17 +90,9 @@ jose_payload = {
     "signature": _b64(sig)
 }
 
-# rsa_key.public_key().verify(
-#     base64.urlsafe_b64decode(jose_payload['signature']),
-#     message,
-#     padding.PKCS1v15(),
-#     hashes.SHA256()
-# )
+# pprint("{0}.{1}.{2}".format(jose_payload['protected'], jose_payload['payload'], jose_payload['signature']))
+# pprint(jws_headers)
 
-# jws_headers["Host"] = 'localhost:14000'
-pprint("{0}.{1}.{2}".format(jose_payload['protected'], jose_payload['payload'], jose_payload['signature']))
-pprint(jws_headers)
-# pprint(jose_payload)
 r = requests.post(
     url=directory_data['newAccount'], 
     json=jose_payload, 
