@@ -28,8 +28,7 @@ class FixedResolver(BaseResolver):
             reply.add_answer(a)
         return reply
 
-if __name__ == '__main__':
-
+def run(zones=None):
     import argparse,sys,time
 
     p = argparse.ArgumentParser(description="Fixed DNS Resolver")
@@ -61,7 +60,8 @@ if __name__ == '__main__':
             args.response = sys.stdin
         else:
             args.response = open(args.zonefile)
-
+    if zones:
+        args.response = "\n".join(zones)
     resolver = FixedResolver(args.response)
     logger = DNSLogger(args.log,args.log_prefix)
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
                         args.address or "*",
                         args.port,
                         "UDP/TCP" if args.tcp else "UDP"))
-
+    
     for rr in resolver.rrs:
         print("    | ",rr.toZone().strip(),sep="")
     print()
@@ -93,3 +93,6 @@ if __name__ == '__main__':
 
     while udp_server.isAlive():
         time.sleep(1)
+
+if __name__ == '__main__':
+    run()

@@ -3,7 +3,9 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding, utils
 from pprint import pprint, pformat
 import sys, requests, copy, json, base64, binascii, hashlib, os, time, datetime
-import logging
+import logging, subprocess
+import dns_server
+import multiprocessing
 
 WRITE_KEYS = False
 ACME_SERVER_URL = "https://localhost:14000/dir"
@@ -223,6 +225,9 @@ def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbpr
         token = challenge['token']
         key_auth = "{0}.{1}".format(token, thumbprint)
         if challenge_type == 'http-01':
+            # start DNS server with just A record
+            dns_thread = multiprocessing.Process(target=dns_server.run)
+            dns_thread.start()
             # Create file on domain and write key_auth to challenge file
             # First we create the directory
             challenge_dir = os.path.join('.well-known','acme-challenge')
@@ -246,6 +251,7 @@ def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbpr
             if not valid:
                 raise Exception('Challenge failed.')
             os.remove(challenge_path) # remove the challenge file after validation            
+            dns_thread.terminate()
     return confirmations, nonce
 
 # main
