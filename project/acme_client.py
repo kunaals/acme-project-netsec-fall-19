@@ -1,9 +1,11 @@
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding, utils
-from pprint import pprint
-import sys, requests, copy, json, base64, binascii, hashlib, os
+from pprint import pprint, pformat
+import sys, requests, copy, json, base64, binascii, hashlib, os, time, datetime
+import logging
 
+WRITE_KEYS = False
 ACME_SERVER_URL = "https://localhost:14000/dir"
 pebble_cert = "project/pebble_https_ca.pem"
 directory_headers = {"User-Agent": "myacmeclient"}
@@ -37,7 +39,35 @@ def _new_nonce():
     )
     return r.headers['Replay-Nonce']
 
-def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None):
+def _poll_challenge(a_url, nonce, rsa_key, kid):
+    # Helper method that returns True when challenge is validated
+    # and returns False if the challenge is not validated within 10 tries
+    chall = _send_signed_request(
+        a_url,
+        "",
+        nonce,
+        rsa_key,
+        kid=kid
+    )
+    nonce = chall.headers['Replay-Nonce']
+    i = 1
+    while chall.json()['status'] != 'valid':
+        if i > 10:
+            return False, nonce
+        time.sleep(2) # sleep for 2 seconds
+        chall = _send_signed_request(
+            a_url,
+            "",
+            nonce,
+            rsa_key,
+            kid=kid
+        )
+        nonce = chall.headers['Replay-Nonce']
+        i = i + 1
+    return True, nonce
+
+
+def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None, field_check=None):
     # Generate protected header
     protected = {
         "alg": "RS256",
@@ -88,11 +118,20 @@ def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None):
     if r.status_code != 200 and r.status_code != 201:
         # First try a new nonce
         try:
+            logging.debug('Trying new nonce.')
+            print('new nonce')
             nonce = _new_nonce()
-            _send_signed_request(url, payload, nonce, rsa_key, kid, jwk)
+            r = _send_signed_request(url, payload, nonce, rsa_key, kid, jwk)
         except:
             raise Exception("Failed request. " + json.dumps(r.json()))
-    
+    i = 0
+    while field_check != None and field_check not in r.json() and i < 10:
+        logging.debug('FIELD CHECK: ' + pformat(r.json()))
+        print('field check')
+        time.sleep(1) # wait before next call
+        nonce = _new_nonce()
+        i = i + 1
+        r = _send_signed_request(url, payload, nonce, rsa_key, kid, jwk)
     return r
 
 def create_account():
@@ -104,20 +143,21 @@ def create_account():
         backend=default_backend()
     )
 
-    # Write our private key to disk for safe keeping
-    with open("project/rsa_private_key.pem", "wb+") as f:
-        f.write(rsa_key.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.BestAvailableEncryption(b"passphrase"),
-        ))
+    if WRITE_KEYS:
+        # Write our private key to disk for safe keeping
+        with open("project/rsa_private_key.pem", "wb+") as f:
+            f.write(rsa_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.BestAvailableEncryption(b"passphrase"),
+            ))
 
-    # Write our public key to disk for safe keeping
-    with open("project/rsa_public_key.pem", "wb+") as f:
-        f.write(rsa_key.public_key().public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
-        ))
+        # Write our public key to disk for safe keeping
+        with open("project/rsa_public_key.pem", "wb+") as f:
+            f.write(rsa_key.public_key().public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            ))
 
     # Generate protected header
     jwk = {
@@ -157,56 +197,83 @@ def submit_order(domains, challenge, nonce, rsa_key, kid):
         payload,
         nonce=nonce,
         rsa_key=rsa_key,
-        kid=kid
+        kid=kid,
+        field_check="authorizations"
     )
     return order, order.headers['Replay-Nonce']
 
-def solve_challenges(authorizations, nonce, rsa_key, kid, challenge, thumbprint):
-    confirmations = []
+def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbprint):
+    if challenge_type != 'http-01' and challenge_type != 'dns-01':
+        raise Exception('Invalid challenge type.')
+    confirmations = [] # store confirmation responses of the challenges that we attempt
     for a_url in authorizations["authorizations"]:
+        # Retrieve challenges from ACME server
         chall = _send_signed_request(
             a_url,
             "",
             nonce,
             rsa_key,
-            kid=kid
+            kid=kid,
+            field_check="challenges"
         )
-        pprint(chall.json())
         nonce = chall.headers['Replay-Nonce']
-        challenge = [c for c in chall.json()["challenges"] if c['type'] == challenge][0]
-        domain = chall.json()['identifier']['value']
+        # Isolate the types of challenges that we wish to attempt
+        challenge = [c for c in chall.json()["challenges"] if c['type'] == challenge_type][0]
+        # domain = chall.json()['identifier']['value']
         token = challenge['token']
         key_auth = "{0}.{1}".format(token, thumbprint)
-        # Create file on domain and write key_auth to challenge file
-        # First we create the directory
-        challenge_dir = os.path.join('.well-known','acme-challenge')
-        if not os.path.exists(challenge_dir):
-            os.makedirs(challenge_dir)
-        # Then we write the file with name token
-        with open(os.path.join(challenge_dir, token), "x") as file:
-            file.write(key_auth)
-        # send confirmation to challenge-url
-        confirmation = _send_signed_request(
-            challenge['url'],
-            {},
-            nonce,
-            rsa_key,
-            kid
-        )
-        nonce = confirmation.headers['Replay-Nonce']
-        confirmations.append(confirmation)
+        if challenge_type == 'http-01':
+            # Create file on domain and write key_auth to challenge file
+            # First we create the directory
+            challenge_dir = os.path.join('.well-known','acme-challenge')
+            if not os.path.exists(challenge_dir):
+                os.makedirs(challenge_dir)
+            # Then we write the file with name token
+            challenge_path = os.path.join(challenge_dir, token)
+            with open(challenge_path, "x") as file:
+                file.write(key_auth)
+            # POST to the challenge url indicating that we have created the challenge file
+            confirmation = _send_signed_request(
+                challenge['url'],
+                {},
+                nonce,
+                rsa_key,
+                kid
+            )
+            nonce = confirmation.headers['Replay-Nonce']
+            confirmations.append(confirmation)
+            valid = _poll_challenge(a_url, nonce, rsa_key, kid)
+            if not valid:
+                raise Exception('Challenge failed.')
+            os.remove(challenge_path) # remove the challenge file after validation            
     return confirmations, nonce
 
 # main
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+logging.basicConfig(level=logging.DEBUG, filename="logs/{0}.txt".format(datetime.datetime.now()))
+logging.info("starting")
 # Create account
 account, rsa_key, thumbprint = create_account()
+while 'Location' not in account.headers:
+    print('Location not in account.headers')
+    logging.debug(pformat(account))
+    # wait before next call and retry
+    time.sleep(1)
+    account, rsa_key, thumbprint = create_account()
 kid = account.headers['Location']
 nonce = account.headers['Replay-Nonce']
 
 # Submit order 
-order, nonce = submit_order(["example.com"], "dns", nonce, rsa_key, kid) # dns or http01
+order, nonce = submit_order(["example.com", "example.org"], "dns", nonce, rsa_key, kid) # dns or http01
 authorizations = order.json() # contains identifiers and list of authorizations
+# while 'authorizations' not in authorizations:
+#     print('authorizations not in authorizations')
+#     logging.debug(pformat(authorizations))
+#     time.sleep(1) # wait before next call
+#     order, nonce = submit_order(["example.com"], "dns", nonce, rsa_key, kid) # dns or http01
+#     authorizations = order.json() # contains identifiers and list of authorizations
 
 # Solicit and solve challenges
-confirmations, nonce = solve_challenges(authorizations, nonce, rsa_key, kid, 'http-01', thumbprint)
+confirmations, nonce = solve_challenge(authorizations, nonce, rsa_key, kid, 'http-01', thumbprint)
 
