@@ -348,7 +348,39 @@ def send_csr(finalize_url, nonce, rsa_key, kid, domains):
     return r, r.headers['Replay-Nonce']
 
 if __name__ == '__main__':
+    q = argparse.ArgumentParser(description="A simple ACME client.")
+    q.add_argument("challenge_type", choices=['http01', 'dns01'])
+    q.add_argument("--dir",required=True,
+                    metavar="<dir>",
+                    help="(required) DIR URL is the directory URL of the ACME server that should be used.")
+    q.add_argument("--record", required=True,
+                    metavar="<record>",
+                    help="(required) IPv4 ADDRESS is the IPv4 address which must be returned \
+                    by your DNSserver for all A-record queries.")
+    q.add_argument("--domain", required=True,
+                    metavar="<domain>",
+                    help="(required, multiple) DOMAIN is the domain for which to request the certificate. \
+                        If multiple --domain flags are present, a single certificate for multiple domains should \
+                        be requested. Wildcard domains have no special flag and are simply denoted by, \
+                        e.g., *.example.net.")
+    q.add_argument("--revoke",action='store_true',default=False,
+                    help="(optional) If present, your application should immediately revoke the certificate \
+                        after obtaining it. In both cases, your application should start its HTTPS server \
+                        and set it up to use the newly obtained certificate.")
 
+    params = q.parse_args()
+
+    DIR_URL = params.dir
+    print(DIR_URL)
+    IPv4_RECORD = params.record
+    print(IPv4_RECORD)
+    domains = ["example.com", "example.org"]
+    print(params.domain)
+    if params.challenge_type == 'http01':
+        challenge_type = 'http-01'
+    else:
+        challenge_type = 'dns-01'
+    print(challenge_type)
     http_thread = multiprocessing.Process(
         target=http_server.run,
         args=[IPv4_RECORD]
@@ -381,7 +413,6 @@ if __name__ == '__main__':
     cert_request = _send_signed_request(order_url, "", nonce, rsa_key, kid, field_check='certificate')
     # pprint(cert_request.json())
     cert = _send_signed_request(cert_request.json()['certificate'], "", nonce, rsa_key, kid)
-    pprint(cert.text)
     with open("web_cert.pem", "wb+") as f:
         f.write(cert.text.encode('utf-8'))
     http_thread.terminate()

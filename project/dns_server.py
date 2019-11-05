@@ -28,7 +28,7 @@ class FixedResolver(BaseResolver):
             reply.add_answer(a)
         return reply
 
-def run(zones=None):
+def run(zones):
     import argparse,sys,time
 
     p = argparse.ArgumentParser(description="Fixed DNS Resolver")
@@ -49,50 +49,32 @@ def run(zones=None):
                     help="Max UDP packet length (default:0)")
     p.add_argument("--tcp",action='store_true',default=False,
                     help="TCP server (default: UDP only)")
-    p.add_argument("--log",default="request,reply,truncated,error",
-                    help="Log hooks to enable (default: +request,+reply,+truncated,+error,-recv,-send,-data)")
-    p.add_argument("--log-prefix",action='store_true',default=False,
-                    help="Log prefix (timestamp/handler/resolver) (default: False)")
-    args = p.parse_args()
+
     
-    if args.zonefile:
-        if args.zonefile == '-':
-            args.response = sys.stdin
-        else:
-            args.response = open(args.zonefile)
-    if zones:
-        args.response = "\n".join(zones)
-    resolver = FixedResolver(args.response)
-    logger = DNSLogger(args.log,args.log_prefix)
+    responses = "\n".join(zones)
+    resolver = FixedResolver(responses)
+    logger = DNSLogger("request,reply,truncated,error", False)
 
     print("Starting Fixed Resolver (%s:%d) [%s]" % (
-                        args.address or "*",
-                        args.port,
-                        "UDP/TCP" if args.tcp else "UDP"))
+                        "*",
+                        10053,
+                        "UDP"))
     
     for rr in resolver.rrs:
         print("    | ",rr.toZone().strip(),sep="")
     print()
 
-    if args.udplen:
-        DNSHandler.udplen = args.udplen
+    if 0:
+        DNSHandler.udplen = 0
 
     udp_server = DNSServer(resolver,
-                           port=args.port,
-                           address=args.address,
+                           port=10053,
+                           address="",
                            logger=logger)
     udp_server.start_thread()
-
-    if args.tcp:
-        tcp_server = DNSServer(resolver,
-                               port=args.port,
-                               address=args.address,
-                               tcp=True,
-                               logger=logger)
-        tcp_server.start_thread()
 
     while udp_server.isAlive():
         time.sleep(1)
 
 if __name__ == '__main__':
-    run()
+    run(['. 60 IN A 127.0.0.1'])
