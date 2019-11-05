@@ -25,25 +25,16 @@ import http_server
 import http_shutdown_server
 import https_server
 
-DIR_URL = "https://localhost:14000/dir"
-IPv4_RECORD = "127.0.0.1"
-domains = ["example.com", "example.org"]
-challenge_type = 'dns-01'
+# some old defaults, overridden in main
+# DIR_URL = "https://localhost:14000/dir"
+# IPv4_RECORD = "127.0.0.1"
+# domains = ["example.com", "example.org"]
+# challenge_type = 'dns-01'
 
-WRITE_KEYS = True
-pebble_cert = "pebble_https_ca.pem"
-directory_headers = {"User-Agent": "myacmeclient"}
-# GET acme server config from /dir
-directory_data = requests.get(
-    url=DIR_URL, 
-    headers=directory_headers, 
-    verify=pebble_cert
-).json()
-jws_headers = copy.deepcopy(directory_headers)
-jws_headers["Content-Type"] = "application/jose+json"
-
-# for str in sys.argv:
-#     print(str)
+PEBBLE_CERT = "pebble_https_ca.pem"
+global DIR_URL
+global directory_headers
+global jws_headers
 
 def _b64(b):
     # encodes string as base64
@@ -59,7 +50,7 @@ def _new_nonce():
     r = requests.head(
         url = directory_data['newNonce'], 
         headers=directory_headers, 
-        verify=pebble_cert
+        verify=PEBBLE_CERT
     )
     return r.headers['Replay-Nonce']
 
@@ -136,7 +127,7 @@ def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None, field
         url=url, 
         json=jose_payload, 
         headers=jws_headers, 
-        verify=pebble_cert
+        verify=PEBBLE_CERT
     )
 
     i = 0
@@ -175,21 +166,20 @@ def create_account():
         backend=default_backend()
     )
 
-    if WRITE_KEYS:
-        # Write our private key to disk for safe keeping
-        with open("rsa_private_key.pem", "wb+") as f:
-            f.write(rsa_key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=serialization.NoEncryption(),
-            ))
+    # Write our private key to disk for safe keeping
+    with open("rsa_private_key.pem", "wb+") as f:
+        f.write(rsa_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption(),
+        ))
 
-        # Write our public key to disk for safe keeping
-        with open("rsa_public_key.pem", "wb+") as f:
-            f.write(rsa_key.public_key().public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo
-            ))
+    # Write our public key to disk for safe keeping
+    with open("rsa_public_key.pem", "wb+") as f:
+        f.write(rsa_key.public_key().public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        ))
 
     # Generate protected header
     jwk = {
@@ -233,7 +223,7 @@ def submit_order(domains, challenge, nonce, rsa_key, kid):
     )
     return order, order.headers['Replay-Nonce']
 
-def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbprint):
+def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbprint, IPv4_RECORD):
     if challenge_type != 'http-01' and challenge_type != 'dns-01':
         raise Exception('Invalid challenge type.')
     confirmations = [] # store confirmation responses of the challenges that we attempt
@@ -350,7 +340,7 @@ def send_csr(finalize_url, nonce, rsa_key, kid, domains):
 if __name__ == '__main__':
     q = argparse.ArgumentParser(description="A simple ACME client.")
     q.add_argument("challenge_type", choices=['http01', 'dns01'])
-    q.add_argument("--dir",required=True,
+    q.add_argument("--dir",required=True, type=str,
                     metavar="<dir>",
                     help="(required) DIR URL is the directory URL of the ACME server that should be used.")
     q.add_argument("--record", required=True,
@@ -370,12 +360,20 @@ if __name__ == '__main__':
 
     params = q.parse_args()
 
+    directory_headers = {"User-Agent":"myacmeclient"}
+    jws_headers = copy.deepcopy(directory_headers)
+    jws_headers["Content-Type"] = "application/jose+json"
     DIR_URL = params.dir
+    # GET acme server config from /dir
+    directory_data = requests.get(
+        url=DIR_URL, 
+        headers=directory_headers, 
+        verify=PEBBLE_CERT
+    ).json()
     print(DIR_URL)
     IPv4_RECORD = params.record
     print(IPv4_RECORD)
-    domains = ["example.com", "example.org"]
-    print(params.domain)
+    domains = [params.domain]
     if params.challenge_type == 'http01':
         challenge_type = 'http-01'
     else:
@@ -407,7 +405,7 @@ if __name__ == '__main__':
     order_url = order.headers['Location']
 
     # Solicit and solve challenges
-    confirmations, nonce = solve_challenge(order_json, nonce, rsa_key, kid, challenge_type, accountkey)
+    confirmations, nonce = solve_challenge(order_json, nonce, rsa_key, kid, challenge_type, accountkey, IPv4_RECORD)
     csr_response, nonce = send_csr(order_json['finalize'], nonce, rsa_key, kid, domains)
     # pprint(csr_response.json())
     cert_request = _send_signed_request(order_url, "", nonce, rsa_key, kid, field_check='certificate')
