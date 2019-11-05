@@ -2,3 +2,5 @@
 logs/*
 .well_known/*
 __pycache__/*
+archived_logs/*
+*.pyc
