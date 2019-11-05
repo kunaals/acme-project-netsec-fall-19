@@ -169,7 +169,6 @@ def create_account():
     }
 
     accountkey = json.dumps(jwk, sort_keys=True, separators=(',', ':'))
-    thumbprint = _b64(hashlib.sha256(accountkey.encode("utf-8")).digest())
 
     # Generate payload for JWS
     payload = {
@@ -187,7 +186,7 @@ def create_account():
         rsa_key=rsa_key, 
         jwk=jwk
     )
-    return account, rsa_key, thumbprint
+    return account, rsa_key, accountkey
 
 def submit_order(domains, challenge, nonce, rsa_key, kid):
     payload = { 'identifiers': [] }
@@ -221,10 +220,14 @@ def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbpr
         nonce = chall.headers['Replay-Nonce']
         # Isolate the types of challenges that we wish to attempt
         challenge = [c for c in chall.json()["challenges"] if c['type'] == challenge_type][0]
-        # domain = chall.json()['identifier']['value']
+        domain = chall.json()['identifier']['value']
         token = challenge['token']
-        key_auth = "{0}.{1}".format(token, thumbprint)
+        thumbprint = hashlib.sha256(accountkey.encode("utf-8")).digest()
+        key_auth = "{0}.{1}".format(token, _b64(thumbprint))
+        key_auth_dns = _b64(hashlib.sha256(key_auth.encode("utf-8")).digest())
         if challenge_type == 'http-01':
+            thumbprint = _b64(hashlib.sha256(accountkey.encode("utf-8")).digest())
+            key_auth = "{0}.{1}".format(token, thumbprint)
             # start DNS server with just A record
             dns_thread = multiprocessing.Process(target=dns_server.run)
             dns_thread.start()
@@ -252,6 +255,29 @@ def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbpr
                 raise Exception('Challenge failed.')
             os.remove(challenge_path) # remove the challenge file after validation            
             dns_thread.terminate()
+        elif challenge_type == 'dns-01':
+            # start DNS server with A record and TXT record for challenge
+            dns_thread = multiprocessing.Process(
+                target=dns_server.run,
+                args=([
+                    '. 60 IN A 127.0.0.1', 
+                    '_acme-challenge.{0} 60 IN TXT \"{1}\"'.format(domain, key_auth_dns)
+                ],)
+            )
+            dns_thread.start()
+            confirmation = _send_signed_request(
+                challenge['url'],
+                {},
+                nonce,
+                rsa_key,
+                kid
+            )
+            nonce = confirmation.headers['Replay-Nonce']
+            confirmations.append(confirmation)
+            valid = _poll_challenge(a_url, nonce, rsa_key, kid)
+            if not valid:
+                raise Exception('Challenge failed.')
+            dns_thread.terminate()
     return confirmations, nonce
 
 # main
@@ -260,7 +286,7 @@ if not os.path.exists('logs'):
 logging.basicConfig(level=logging.DEBUG, filename="logs/{0}.txt".format(datetime.datetime.now()))
 logging.info("starting")
 # Create account
-account, rsa_key, thumbprint = create_account()
+account, rsa_key, accountkey = create_account()
 while 'Location' not in account.headers:
     print('Location not in account.headers')
     logging.debug(pformat(account))
@@ -273,13 +299,7 @@ nonce = account.headers['Replay-Nonce']
 # Submit order 
 order, nonce = submit_order(["example.com", "example.org"], "dns", nonce, rsa_key, kid) # dns or http01
 authorizations = order.json() # contains identifiers and list of authorizations
-# while 'authorizations' not in authorizations:
-#     print('authorizations not in authorizations')
-#     logging.debug(pformat(authorizations))
-#     time.sleep(1) # wait before next call
-#     order, nonce = submit_order(["example.com"], "dns", nonce, rsa_key, kid) # dns or http01
-#     authorizations = order.json() # contains identifiers and list of authorizations
 
 # Solicit and solve challenges
-confirmations, nonce = solve_challenge(authorizations, nonce, rsa_key, kid, 'http-01', thumbprint)
+confirmations, nonce = solve_challenge(authorizations, nonce, rsa_key, kid, 'dns-01', accountkey)
 
