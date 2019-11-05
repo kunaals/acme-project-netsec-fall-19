@@ -1,0 +1,56 @@
+INFO:root:starting
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /sign-me-up HTTP/1.1" 201 542
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /order-plz HTTP/1.1" 201 530
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/FJpS7Coaqg2RkhbQNlVnUCdghSryUlB00D5-wLX38ro HTTP/1.1" 200 862
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /chalZ/xymbWIJXPDBcN_M-dOLmwSu4VmNR338Uvn4hBG0XNjg HTTP/1.1" 200 193
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/FJpS7Coaqg2RkhbQNlVnUCdghSryUlB00D5-wLX38ro HTTP/1.1" 200 908
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/FJpS7Coaqg2RkhbQNlVnUCdghSryUlB00D5-wLX38ro HTTP/1.1" 200 908
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/FJpS7Coaqg2RkhbQNlVnUCdghSryUlB00D5-wLX38ro HTTP/1.1" 200 436
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/T5_WRe124JVoK3TQy4nIS4eJtHJZAMkrNpcNQwevH5M HTTP/1.1" 400 147
+DEBUG:root:FIELD CHECK: {'detail': 'JWS has an invalid anti-replay nonce: D_2O6PWJs_c7L3Fdfx3UEw',
+ 'status': 400,
+ 'type': 'urn:ietf:params:acme:error:badNonce'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/T5_WRe124JVoK3TQy4nIS4eJtHJZAMkrNpcNQwevH5M HTTP/1.1" 200 862
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /chalZ/5v9fEScY4LQw44atLW-u2LIzVI9CEKg6EyQHhPsbDDI HTTP/1.1" 200 193
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/T5_WRe124JVoK3TQy4nIS4eJtHJZAMkrNpcNQwevH5M HTTP/1.1" 200 908
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/T5_WRe124JVoK3TQy4nIS4eJtHJZAMkrNpcNQwevH5M HTTP/1.1" 200 436
+DEBUG:root:CSR: {'csr': 'MIIC4DCCAcgCAQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xEzARBgNVBAoMCk15IENvbXBhbnkxFDASBgNVBAMMC2V4YW1wbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyYICtrkhCrHQoj_Y16fBYfE-fhwvySxFOXQeiQxbcPUUl-eV8N50aI4KZau2DSyUD73SONd2JSWer1JVeOBPTTDD_iF0LdDINmfEOfjiiKmc6a344tMgvazh84tLZihCAT_a5AzeoMFNIDNYidLwZ-bCtY06l6p-yTROm39_6vt3mFJFibLhvKv7HGc7fpA-G3TA9P6tCMcJSJimxVh08sQUsTaz36ki-4FyNJj7fKJLu8f5adDBjlS0_tbFyJQWvpmbCNArEI9G-Wk8Qexv4TS-xnb_icpOq-rJaVA_8T5epA90QoG7byiYgcYvYfYCsJjUV7EVaPJz_3fTT1ZpWQIDAQABoDYwNAYJKoZIhvcNAQkOMScwJTAjBgNVHREEHDAaggtleGFtcGxlLmNvbYILZXhhbXBsZS5vcmcwDQYJKoZIhvcNAQELBQADggEBAJJQRyFvv1WOZ9TG6fyTZelmdY8UJR_phULgTa87mrqm4kBI-NwNwJiq2wPbRCEQ_aGWr6TYv_kIpdfSOeMsf7BJLAnDrPB2NXXpHb8zBP_FRvPJ4w6qKcl_2n4WswSHNJMBoriB_8an6bkLLBaiDosh-FhP0KdxL637ntawbff_bkEcaKdrcO7K3_lJZwJX535cdsoYmUImBGs3HdSKKBvlV8HkZ--WsUkuwUqlAV50w84u4VWvxfUYUj9bDRYM2YQY2ditzeWi69nz5Z0-OxdJ8L76uZ1NsoUshKJocdO4rf_Elq63gftMEDPMxLp_UXKPgNlG5KXB0wgFhEplUbw'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/fE56cMw1CSsBkwELk03f81mweFaGF8FtA2tQ1L_UJfU HTTP/1.1" 400 147
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/fE56cMw1CSsBkwELk03f81mweFaGF8FtA2tQ1L_UJfU HTTP/1.1" 200 533
+DEBUG:root:{'authorizations': ['https://localhost:14000/authZ/T5_WRe124JVoK3TQy4nIS4eJtHJZAMkrNpcNQwevH5M',
+                    'https://localhost:14000/authZ/FJpS7Coaqg2RkhbQNlVnUCdghSryUlB00D5-wLX38ro'],
+ 'expires': '2019-11-06T20:35:57Z',
+ 'finalize': 'https://localhost:14000/finalize-order/fE56cMw1CSsBkwELk03f81mweFaGF8FtA2tQ1L_UJfU',
+ 'identifiers': [{'type': 'dns', 'value': 'example.org'},
+                 {'type': 'dns', 'value': 'example.com'}],
+ 'status': 'processing'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/fE56cMw1CSsBkwELk03f81mweFaGF8FtA2tQ1L_UJfU HTTP/1.1" 200 596
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /certZ/02624ca22604329f HTTP/1.1" 400 147
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /certZ/02624ca22604329f HTTP/1.1" 200 None

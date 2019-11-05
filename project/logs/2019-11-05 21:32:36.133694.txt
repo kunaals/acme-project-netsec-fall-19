@@ -1,0 +1,316 @@
+INFO:root:starting
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /sign-me-up HTTP/1.1" 201 542
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /order-plz HTTP/1.1" 201 530
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk HTTP/1.1" 200 862
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /chalZ/PrpMH3cWz_cGBFynTVvbSbTgwSKEImgXvuu73HSEsdE HTTP/1.1" 200 194
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk HTTP/1.1" 400 147
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk HTTP/1.1" 200 908
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk HTTP/1.1" 200 437
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 400 147
+DEBUG:root:FIELD CHECK: {'detail': 'JWS has an invalid anti-replay nonce: ZmplVB6-GNtLG6xB7D8PeQ',
+ 'status': 400,
+ 'type': 'urn:ietf:params:acme:error:badNonce'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 862
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /chalZ/IK3eL1exDeifeECKd2qjmdqSyomO5WaN9oKTSHlDaWo HTTP/1.1" 200 194
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 400 147
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 908
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU HTTP/1.1" 200 738
+DEBUG:root:CSR: {'csr': 'MIIC4DCCAcgCAQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xEzARBgNVBAoMCk15IENvbXBhbnkxFDASBgNVBAMMC2V4YW1wbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxvZCLZSL9tkQZeWeZwPqyhvOLzZJfy_R54WzPR2pQ4UnVnZSrDkqSGFxcoyTN44zDj-UPWOQa2rE96A5uSKWJmu_v87Lrm84a55WRDz2V38y86PhGIrLCuixAVXhNEH2FXJgZ49Pc43FELm2wI5VSngdkO3RhiWTTnl4yaKH4SNPRRQ1Tx4N6_Dko5tN85P8gYwtwfsrDxBRvBPHoAKyBxPmbGyI2rv7B4noV7EJFygOr32SNZxmjlEYc3rzaHw3xFknLmJWBf3zyzHHmucDT6u3KReAQqZwOnVzWj-XaFpqmuU54HdopMXawrf5wRKAsQAQpkzZdpH2RM9oReIeWQIDAQABoDYwNAYJKoZIhvcNAQkOMScwJTAjBgNVHREEHDAaggtleGFtcGxlLmNvbYILZXhhbXBsZS5vcmcwDQYJKoZIhvcNAQELBQADggEBAITfjULaGspJPvHWQ6ROgvRBjZSP2Cskx_B3DUYXcxzyz_Tw3ld3bg2SXo6tFoJ_5mWW0HluN3to7aCYBzMZnmYinrm5YYUAQv4LrOIrdDRhlZKmg47RlaIP_f9KWMmJH-DOwNyyD4WXsDQxrD_NKFfk_wEwzudLXYerPRl6POAicgSZEy5BU4gLIQYnsLcoUKVHGCLF8Jnb30YnEy2AXTvnGD-seQELV4DlHjoSJhCZCNgyesUHD8ezLMhp5RjemUIwnL61Mk4YqhS02uJuYrS2Zwdd95cRye-nho0_06vsTQF1SG_Mblo91hEkTnc6jJ-EifC-K46G5prnITBoh6U'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 400 147
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 403 134
+DEBUG:root:{'detail': 'Order\'s status ("invalid") was not ready',
+ 'status': 403,
+ 'type': 'urn:ietf:params:acme:error:orderNotReady'}
+DEBUG:root:{'detail': 'JWS has an invalid anti-replay nonce: 08PCztTJVwJLiRfrbAcnEQ',
+ 'status': 400,
+ 'type': 'urn:ietf:params:acme:error:badNonce'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU',
+                    'https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.org'},
+                 {'type': 'dns', 'value': 'example.com'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU',
+                    'https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.com'},
+                 {'type': 'dns', 'value': 'example.org'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU',
+                    'https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.org'},
+                 {'type': 'dns', 'value': 'example.com'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 400 147
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk',
+                    'https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.org'},
+                 {'type': 'dns', 'value': 'example.com'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk',
+                    'https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.com'},
+                 {'type': 'dns', 'value': 'example.org'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU',
+                    'https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.com'},
+                 {'type': 'dns', 'value': 'example.org'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU',
+                    'https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.org'},
+                 {'type': 'dns', 'value': 'example.com'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU',
+                    'https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.com'},
+                 {'type': 'dns', 'value': 'example.org'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 400 147
+DEBUG:root:Trying new nonce.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk',
+                    'https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.com'},
+                 {'type': 'dns', 'value': 'example.org'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797
+DEBUG:root:FIELD CHECK: {'authorizations': ['https://localhost:14000/authZ/DCvblHzjX4belG5M2xVhW9l_GDEQAiKJPGfoorr5Uwk',
+                    'https://localhost:14000/authZ/zuFbVx-mxRixMVWUIHJzbfHRoJf_Gqrrz5_7pKV18LU'],
+ 'error': {'detail': 'Get '
+                     'http://example.com:5002/.well-known/acme-challenge/eixAPh0A9ACgc9pW6FthR-SpBCbTqfjnNgOK3Ogk6Oo: '
+                     'dial tcp 127.0.0.1:5002: connect: connection refused',
+           'status': 400,
+           'type': 'urn:ietf:params:acme:error:connection'},
+ 'expires': '2019-11-06T20:32:36Z',
+ 'finalize': 'https://localhost:14000/finalize-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528',
+ 'identifiers': [{'type': 'dns', 'value': 'example.org'},
+                 {'type': 'dns', 'value': 'example.com'}],
+ 'status': 'invalid'}
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "HEAD /nonce-plz HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): localhost:14000
+DEBUG:urllib3.connectionpool:https://localhost:14000 "POST /my-order/M7BrEx56aponr1yNZYz-ZntU6z6_sYpUrfM9bCrp528 HTTP/1.1" 200 797

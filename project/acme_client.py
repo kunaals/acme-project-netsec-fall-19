@@ -1,15 +1,29 @@
-from cryptography import x509
-from cryptography.x509.oid import NameOID
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric import rsa, padding, utils
-from pprint import pprint, pformat
-import sys, requests, copy, json, base64, binascii, hashlib, os, time, datetime
-import logging, subprocess
-import dns_server
-import https_server
-import http_server
+import argparse
+import base64
+import binascii
+import copy
+import datetime
+import hashlib
+import json
+import logging
 import multiprocessing
+import os
+import subprocess
+import sys
+import time
+from pprint import pformat, pprint
+
+import requests
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa, utils
+from cryptography.x509.oid import NameOID
+
+import dns_server
+import http_server
+import http_shutdown_server
+import https_server
 
 DIR_URL = "https://localhost:14000/dir"
 IPv4_RECORD = "127.0.0.1"
@@ -245,7 +259,12 @@ def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbpr
             thumbprint = _b64(hashlib.sha256(accountkey.encode("utf-8")).digest())
             key_auth = "{0}.{1}".format(token, thumbprint)
             # start DNS server with just A record
-            dns_thread = multiprocessing.Process(target=dns_server.run)
+            dns_thread = multiprocessing.Process(
+                target=dns_server.run,
+                args=([
+                    '. 60 IN A ' + IPv4_RECORD, 
+                ],)
+            )
             dns_thread.start()
             # Create file on domain and write key_auth to challenge file
             # First we create the directory
@@ -328,44 +347,55 @@ def send_csr(finalize_url, nonce, rsa_key, kid, domains):
     logging.debug(pformat(r.json()))
     return r, r.headers['Replay-Nonce']
 
-# main
-http_thread = multiprocessing.Process(
-    target=http_server.run,
-    args=[IPv4_RECORD]
-)
-http_thread.start()
-if not os.path.exists('logs'):
-    os.makedirs('logs')
-logging.basicConfig(level=logging.DEBUG, filename="logs/{0}.txt".format(datetime.datetime.now()))
-logging.info("starting")
-# Create account
-account, rsa_key, accountkey = create_account()
-while 'Location' not in account.headers:
-    print('Location not in account.headers')
-    logging.debug(pformat(account))
-    # wait before next call and retry
-    time.sleep(1)
-    account, rsa_key, thumbprint = create_account()
-kid = account.headers['Location']
-nonce = account.headers['Replay-Nonce']
+if __name__ == '__main__':
 
-# Submit order 
-order, nonce = submit_order(domains, "dns", nonce, rsa_key, kid) # dns or http01
-order_json = order.json() # contains identifiers, list of authorizations, and finalize url
-order_url = order.headers['Location']
+    http_thread = multiprocessing.Process(
+        target=http_server.run,
+        args=[IPv4_RECORD]
+    )
+    http_thread.start()
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    logging.basicConfig(level=logging.DEBUG, filename="logs/{0}.txt".format(datetime.datetime.now()))
+    logging.info("starting")
+    # Create account
+    account, rsa_key, accountkey = create_account()
+    while 'Location' not in account.headers:
+        print('Location not in account.headers')
+        logging.debug(pformat(account))
+        # wait before next call and retry
+        time.sleep(1)
+        account, rsa_key, thumbprint = create_account()
+    kid = account.headers['Location']
+    nonce = account.headers['Replay-Nonce']
 
-# Solicit and solve challenges
-confirmations, nonce = solve_challenge(order_json, nonce, rsa_key, kid, challenge_type, accountkey)
-csr_response, nonce = send_csr(order_json['finalize'], nonce, rsa_key, kid, domains)
-# pprint(csr_response.json())
-cert_request = _send_signed_request(order_url, "", nonce, rsa_key, kid, field_check='certificate')
-# pprint(cert_request.json())
-cert = _send_signed_request(cert_request.json()['certificate'], "", nonce, rsa_key, kid)
-pprint(cert.text)
-with open("web_cert.pem", "wb+") as f:
-    f.write(cert.text.encode('utf-8'))
-http_thread.terminate()
-https_thread = multiprocessing.Process(
-    target=https_server.run,
-    args=[IPv4_RECORD])
-https_thread.start()
+    # Submit order 
+    order, nonce = submit_order(domains, "dns", nonce, rsa_key, kid) # dns or http01
+    order_json = order.json() # contains identifiers, list of authorizations, and finalize url
+    order_url = order.headers['Location']
+
+    # Solicit and solve challenges
+    confirmations, nonce = solve_challenge(order_json, nonce, rsa_key, kid, challenge_type, accountkey)
+    csr_response, nonce = send_csr(order_json['finalize'], nonce, rsa_key, kid, domains)
+    # pprint(csr_response.json())
+    cert_request = _send_signed_request(order_url, "", nonce, rsa_key, kid, field_check='certificate')
+    # pprint(cert_request.json())
+    cert = _send_signed_request(cert_request.json()['certificate'], "", nonce, rsa_key, kid)
+    pprint(cert.text)
+    with open("web_cert.pem", "wb+") as f:
+        f.write(cert.text.encode('utf-8'))
+    http_thread.terminate()
+
+    http_shutdown_thread = multiprocessing.Process(
+        target=http_shutdown_server.run,
+        args=[IPv4_RECORD])
+    https_thread = multiprocessing.Process(
+        target=https_server.run,
+        args=[IPv4_RECORD])
+    https_thread.start()
+    http_shutdown_thread.start()
+
+    while http_shutdown_thread.is_alive():
+        pass
+    http_shutdown_thread.terminate()
+    https_thread.terminate()
