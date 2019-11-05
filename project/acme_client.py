@@ -1,3 +1,5 @@
+from cryptography import x509
+from cryptography.x509.oid import NameOID
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding, utils
@@ -5,15 +7,21 @@ from pprint import pprint, pformat
 import sys, requests, copy, json, base64, binascii, hashlib, os, time, datetime
 import logging, subprocess
 import dns_server
+import https_server
+import http_server
 import multiprocessing
 
-WRITE_KEYS = False
-ACME_SERVER_URL = "https://localhost:14000/dir"
-pebble_cert = "project/pebble_https_ca.pem"
+DIR_URL = "https://localhost:14000/dir"
+IPv4_RECORD = "127.0.0.1"
+domains = ["example.com", "example.org"]
+challenge_type = 'dns-01'
+
+WRITE_KEYS = True
+pebble_cert = "pebble_https_ca.pem"
 directory_headers = {"User-Agent": "myacmeclient"}
 # GET acme server config from /dir
 directory_data = requests.get(
-    url=ACME_SERVER_URL, 
+    url=DIR_URL, 
     headers=directory_headers, 
     verify=pebble_cert
 ).json()
@@ -69,7 +77,7 @@ def _poll_challenge(a_url, nonce, rsa_key, kid):
     return True, nonce
 
 
-def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None, field_check=None):
+def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None, field_check=None, retry=True):
     # Generate protected header
     protected = {
         "alg": "RS256",
@@ -117,15 +125,6 @@ def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None, field
         verify=pebble_cert
     )
 
-    if r.status_code != 200 and r.status_code != 201:
-        # First try a new nonce
-        try:
-            logging.debug('Trying new nonce.')
-            print('new nonce')
-            nonce = _new_nonce()
-            r = _send_signed_request(url, payload, nonce, rsa_key, kid, jwk)
-        except:
-            raise Exception("Failed request. " + json.dumps(r.json()))
     i = 0
     while field_check != None and field_check not in r.json() and i < 10:
         logging.debug('FIELD CHECK: ' + pformat(r.json()))
@@ -134,6 +133,23 @@ def _send_signed_request(url, payload, nonce, rsa_key, kid=None, jwk=None, field
         nonce = _new_nonce()
         i = i + 1
         r = _send_signed_request(url, payload, nonce, rsa_key, kid, jwk)
+
+    if r.status_code != 200 and r.status_code != 201 and retry:
+        # We try a new nonce
+        for i in range(10):
+            logging.debug('Trying new nonce.')
+            print('new nonce')
+            nonce = _new_nonce()
+            try:
+                r = _send_signed_request(url, payload, nonce, rsa_key, kid, jwk, retry=False)
+                if r.status_code == 200 or r.status_code == 201: # extra check
+                    return r
+            except:
+                print("failed request")
+    elif r.status_code != 200 and r.status_code != 201 and not retry:
+        logging.debug(pformat(r.json()))
+        raise Exception("Failed request. " + json.dumps(r.json()))
+
     return r
 
 def create_account():
@@ -147,15 +163,15 @@ def create_account():
 
     if WRITE_KEYS:
         # Write our private key to disk for safe keeping
-        with open("project/rsa_private_key.pem", "wb+") as f:
+        with open("rsa_private_key.pem", "wb+") as f:
             f.write(rsa_key.private_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=serialization.BestAvailableEncryption(b"passphrase"),
+                encryption_algorithm=serialization.NoEncryption(),
             ))
 
         # Write our public key to disk for safe keeping
-        with open("project/rsa_public_key.pem", "wb+") as f:
+        with open("rsa_public_key.pem", "wb+") as f:
             f.write(rsa_key.public_key().public_bytes(
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -260,11 +276,12 @@ def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbpr
             dns_thread = multiprocessing.Process(
                 target=dns_server.run,
                 args=([
-                    '. 60 IN A 127.0.0.1', 
+                    '. 60 IN A ' + IPv4_RECORD, 
                     '_acme-challenge.{0} 60 IN TXT \"{1}\"'.format(domain, key_auth_dns)
                 ],)
             )
             dns_thread.start()
+            time.sleep(1)
             confirmation = _send_signed_request(
                 challenge['url'],
                 {},
@@ -280,7 +297,43 @@ def solve_challenge(authorizations, nonce, rsa_key, kid, challenge_type, thumbpr
             dns_thread.terminate()
     return confirmations, nonce
 
+def send_csr(finalize_url, nonce, rsa_key, kid, domains):
+    # Generate a CSR
+    csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
+        # Provide various details about who we are.
+        x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, u"San Francisco"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"My Company"),
+        x509.NameAttribute(NameOID.COMMON_NAME, str(domains[0])),
+    ])).add_extension(
+        x509.SubjectAlternativeName([
+            # Describe what sites we want this certificate for.
+            x509.DNSName(str(d)) for d in domains
+        ]),
+        critical=False,
+    # Sign the CSR with our private key.
+    ).sign(rsa_key, hashes.SHA256(), default_backend())
+    csr_payload = {
+        "csr": _b64(csr.public_bytes(serialization.Encoding.DER)),
+    }
+    logging.debug("CSR: " + pformat(csr_payload))
+    r = _send_signed_request(
+        finalize_url,
+        csr_payload,
+        nonce,
+        rsa_key,
+        kid
+    )
+    logging.debug(pformat(r.json()))
+    return r, r.headers['Replay-Nonce']
+
 # main
+http_thread = multiprocessing.Process(
+    target=http_server.run,
+    args=[IPv4_RECORD]
+)
+http_thread.start()
 if not os.path.exists('logs'):
     os.makedirs('logs')
 logging.basicConfig(level=logging.DEBUG, filename="logs/{0}.txt".format(datetime.datetime.now()))
@@ -297,9 +350,22 @@ kid = account.headers['Location']
 nonce = account.headers['Replay-Nonce']
 
 # Submit order 
-order, nonce = submit_order(["example.com", "example.org"], "dns", nonce, rsa_key, kid) # dns or http01
-authorizations = order.json() # contains identifiers and list of authorizations
+order, nonce = submit_order(domains, "dns", nonce, rsa_key, kid) # dns or http01
+order_json = order.json() # contains identifiers, list of authorizations, and finalize url
+order_url = order.headers['Location']
 
 # Solicit and solve challenges
-confirmations, nonce = solve_challenge(authorizations, nonce, rsa_key, kid, 'dns-01', accountkey)
-
+confirmations, nonce = solve_challenge(order_json, nonce, rsa_key, kid, challenge_type, accountkey)
+csr_response, nonce = send_csr(order_json['finalize'], nonce, rsa_key, kid, domains)
+# pprint(csr_response.json())
+cert_request = _send_signed_request(order_url, "", nonce, rsa_key, kid, field_check='certificate')
+# pprint(cert_request.json())
+cert = _send_signed_request(cert_request.json()['certificate'], "", nonce, rsa_key, kid)
+pprint(cert.text)
+with open("web_cert.pem", "wb+") as f:
+    f.write(cert.text.encode('utf-8'))
+http_thread.terminate()
+https_thread = multiprocessing.Process(
+    target=https_server.run,
+    args=[IPv4_RECORD])
+https_thread.start()
