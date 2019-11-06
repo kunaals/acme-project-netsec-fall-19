@@ -347,8 +347,8 @@ if __name__ == '__main__':
                     metavar="<record>",
                     help="(required) IPv4 ADDRESS is the IPv4 address which must be returned \
                     by your DNSserver for all A-record queries.")
-    q.add_argument("--domain", required=True,
-                    metavar="<domain>",
+    q.add_argument("--domain", required=True, type=str, action='append',
+                    metavar="N",
                     help="(required, multiple) DOMAIN is the domain for which to request the certificate. \
                         If multiple --domain flags are present, a single certificate for multiple domains should \
                         be requested. Wildcard domains have no special flag and are simply denoted by, \
@@ -373,7 +373,8 @@ if __name__ == '__main__':
     print(DIR_URL)
     IPv4_RECORD = params.record
     print(IPv4_RECORD)
-    domains = [params.domain]
+    domains = params.domain
+    print(params.domain)
     if params.challenge_type == 'http01':
         challenge_type = 'http-01'
     else:

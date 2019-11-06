@@ -2,9 +2,10 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 import ssl
 
 def run(IPv4_addr):
-    httpd = HTTPServer((IPv4_addr, 5001), SimpleHTTPRequestHandler)
+    PORT = 5001
+    httpd = HTTPServer((IPv4_addr, PORT), SimpleHTTPRequestHandler)
     httpd.socket = ssl.wrap_socket(httpd.socket, certfile='web_cert.pem', keyfile='rsa_private_key.pem', server_side=True)
-    print("Running!")
+    print("HTTPS Server serving at port", PORT)
     httpd.serve_forever()
 
 if __name__ == '__main__':

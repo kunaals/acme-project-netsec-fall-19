@@ -6,7 +6,7 @@ PORT = 5003
 Handler = http.server.SimpleHTTPRequestHandler
 def run(IPv4_addr):
     with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
-        print("serving at port", PORT)
+        print("HTTP Shutdown Server serving at port", PORT)
         httpd.handle_request()
         httpd.server_close()
         print("Shutdown initiated.")
