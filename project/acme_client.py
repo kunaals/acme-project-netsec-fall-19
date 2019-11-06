@@ -335,7 +335,7 @@ def send_csr(finalize_url, nonce, rsa_key, kid, domains):
         kid
     )
     logging.debug(pformat(r.json()))
-    return r, r.headers['Replay-Nonce']
+    return r, r.headers['Replay-Nonce'], csr_payload
 
 if __name__ == '__main__':
     q = argparse.ArgumentParser(description="A simple ACME client.")
@@ -375,6 +375,8 @@ if __name__ == '__main__':
     print(IPv4_RECORD)
     domains = params.domain
     print(params.domain)
+    print(params.revoke)
+    revoke = params.revoke
     if params.challenge_type == 'http01':
         challenge_type = 'http-01'
     else:
@@ -407,7 +409,15 @@ if __name__ == '__main__':
 
     # Solicit and solve challenges
     confirmations, nonce = solve_challenge(order_json, nonce, rsa_key, kid, challenge_type, accountkey, IPv4_RECORD)
-    csr_response, nonce = send_csr(order_json['finalize'], nonce, rsa_key, kid, domains)
+    csr_response, nonce, csr_payload = send_csr(order_json['finalize'], nonce, rsa_key, kid, domains)
+    if revoke:
+        r = _send_signed_request(
+            directory_data['revokeCert'],
+            csr_payload,
+            nonce,
+            rsa_key,
+            kid
+        )
     # pprint(csr_response.json())
     cert_request = _send_signed_request(order_url, "", nonce, rsa_key, kid, field_check='certificate')
     # pprint(cert_request.json())
