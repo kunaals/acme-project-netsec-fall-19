@@ -410,20 +410,35 @@ if __name__ == '__main__':
     # Solicit and solve challenges
     confirmations, nonce = solve_challenge(order_json, nonce, rsa_key, kid, challenge_type, accountkey, IPv4_RECORD)
     csr_response, nonce, csr_payload = send_csr(order_json['finalize'], nonce, rsa_key, kid, domains)
+    # pprint(csr_response.json())
+    cert_request = _send_signed_request(order_url, "", nonce, rsa_key, kid, field_check='certificate')
+    nonce = cert_request.headers['Replay-Nonce']
+    # pprint(cert_request.json())
+    cert = _send_signed_request(cert_request.json()['certificate'], "", nonce, rsa_key, kid)
+    nonce = cert.headers['Replay-Nonce']
     if revoke:
-        r = _send_signed_request(
+        cert_pem = x509.load_pem_x509_certificate(
+            cert.text.encode('utf-8'), 
+            default_backend()
+        )
+        cert_payload = {
+            "certificate": _b64(cert_pem.public_bytes(serialization.Encoding.DER)),
+        }
+        revoke_resp = _send_signed_request(
             directory_data['revokeCert'],
-            csr_payload,
+            cert_payload,
             nonce,
             rsa_key,
             kid
         )
-    # pprint(csr_response.json())
-    cert_request = _send_signed_request(order_url, "", nonce, rsa_key, kid, field_check='certificate')
-    # pprint(cert_request.json())
-    cert = _send_signed_request(cert_request.json()['certificate'], "", nonce, rsa_key, kid)
+        nonce = revoke_resp.headers['Replay-Nonce']
+        # pprint(revoke_resp.status_code)
+        # pprint(revoke_resp.text)
+        pprint('CERT REVOKED')
+
     with open("web_cert.pem", "wb+") as f:
         f.write(cert.text.encode('utf-8'))
+    
     http_thread.terminate()
 
     http_shutdown_thread = multiprocessing.Process(
